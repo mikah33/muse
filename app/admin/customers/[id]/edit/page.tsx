@@ -5,14 +5,15 @@ import EditCustomerForm from '@/components/admin/EditCustomerForm'
 export default async function EditCustomerPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
+  const { id } = await params
   const supabase = await createClient()
 
   const { data: customer } = await supabase
     .from('users')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', id)
     .eq('role', 'customer')
     .single()
 

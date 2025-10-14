@@ -8,14 +8,15 @@ import DeleteButton from '@/components/admin/DeleteButton'
 export default async function GalleryDetailPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
+  const { id } = await params
   const supabase = await createClient()
 
   const { data: gallery } = await supabase
     .from('galleries')
     .select('*, customer:users!customer_id(full_name, email)')
-    .eq('id', params.id)
+    .eq('id', id)
     .single()
 
   if (!gallery) {

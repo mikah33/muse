@@ -3,7 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import Image from 'next/image'
 
-export default async function CustomerGalleryPage({ params }: { params: { id: string } }) {
+export default async function CustomerGalleryPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -12,7 +13,7 @@ export default async function CustomerGalleryPage({ params }: { params: { id: st
   const { data: gallery } = await supabase
     .from('galleries')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', id)
     .eq('customer_id', user.id)
     .single()
 

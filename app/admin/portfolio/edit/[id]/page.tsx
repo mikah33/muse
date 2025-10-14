@@ -5,14 +5,15 @@ import PortfolioItemForm from '@/components/admin/PortfolioItemForm'
 export default async function EditPortfolioItemPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
+  const { id } = await params
   const supabase = await createClient()
 
   const { data: item } = await supabase
     .from('portfolio_items')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', id)
     .single()
 
   if (!item) {
