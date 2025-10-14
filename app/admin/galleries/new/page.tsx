@@ -4,8 +4,9 @@ import CreateGalleryForm from '@/components/admin/CreateGalleryForm'
 export default async function NewGalleryPage({
   searchParams,
 }: {
-  searchParams: { customer_id?: string }
+  searchParams: Promise<{ customer_id?: string }>
 }) {
+  const params = await searchParams
   const supabase = await createClient()
 
   // Fetch all customers for dropdown
@@ -25,7 +26,7 @@ export default async function NewGalleryPage({
 
         <CreateGalleryForm
           customers={customers || []}
-          preselectedCustomerId={searchParams.customer_id}
+          preselectedCustomerId={params.customer_id}
         />
       </div>
     </div>
