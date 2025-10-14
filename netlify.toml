@@ -4,13 +4,7 @@
 
 [build.environment]
   NODE_VERSION = "20"
-
-# Completely disable secrets scanning - NEXT_PUBLIC vars are meant to be in client bundle
-[build.processing]
-  skip_processing = false
-
-[build.processing.secrets]
-  enabled = false
+  SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
