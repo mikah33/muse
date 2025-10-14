@@ -1,0 +1,18 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  # Node version
+  NODE_VERSION = "20"
+
+# Disable secrets scanning for NEXT_PUBLIC variables (these are meant to be public)
+[build.processing.secrets]
+  enabled = true
+
+[build.processing.secrets.omit_keys]
+  # Allow NEXT_PUBLIC_ prefixed variables in build output (they're meant to be public)
+  keys = ["NEXT_PUBLIC_SUPABASE_ANON_KEY", "NEXT_PUBLIC_SUPABASE_URL"]
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
