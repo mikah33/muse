@@ -99,16 +99,6 @@ export default async function AdminPage() {
             <h2 className="text-lg md:text-xl font-semibold mb-2">Site Settings</h2>
             <p className="text-sm text-gray-600">Manage site configuration</p>
           </Link>
-
-          <div className="bg-white rounded-lg shadow border-l-4 border-gray-300 p-4 md:p-6 opacity-50">
-            <h2 className="text-lg md:text-xl font-semibold mb-2">Gallery Management</h2>
-            <p className="text-sm text-gray-600">Create galleries and upload photos (Coming soon)</p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow border-l-4 border-gray-300 p-4 md:p-6 opacity-50">
-            <h2 className="text-lg md:text-xl font-semibold mb-2">Photo Upload</h2>
-            <p className="text-sm text-gray-600">Upload and organize photos (Coming soon)</p>
-          </div>
         </div>
       </div>
     </div>
