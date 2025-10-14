@@ -134,7 +134,9 @@ export const metadata: Metadata = {
   verification: {
     google: 'verification_token',
     yandex: 'verification_token',
-    bing: 'verification_token',
+  },
+  other: {
+    'msvalidate.01': 'verification_token',
   },
 }
 
