@@ -1,6 +1,8 @@
 import AdminLoginForm from '@/components/admin/AdminLoginForm'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 export default function AdminLoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-8 bg-charcoal">

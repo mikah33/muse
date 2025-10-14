@@ -2,6 +2,8 @@ import Header from '@/components/shared/Header'
 import Footer from '@/components/shared/Footer'
 import SignupForm from '@/components/auth/SignupForm'
 
+export const dynamic = 'force-dynamic'
+
 export default function SignupPage() {
   return (
     <>
