@@ -2,6 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import Image from 'next/image'
+import { FavoriteButton } from '@/components/FavoriteButton'
 
 export default async function CustomerGalleryPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -25,6 +26,14 @@ export default async function CustomerGalleryPage({ params }: { params: Promise<
     .eq('gallery_id', gallery.id)
     .order('order_position', { ascending: true })
 
+  // Get favorites for this user
+  const { data: favorites } = await supabase
+    .from('favorites')
+    .select('photo_id')
+    .eq('customer_id', user.id)
+
+  const favoritePhotoIds = new Set(favorites?.map(f => f.photo_id) || [])
+
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-charcoal text-white p-6">
@@ -37,8 +46,11 @@ export default async function CustomerGalleryPage({ params }: { params: Promise<
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {photos.map((photo) => (
-              <div key={photo.id} className="relative aspect-[4/5]">
+              <div key={photo.id} className="relative aspect-[4/5] group">
                 <Image src={photo.photo_url} alt="" fill className="object-cover rounded-lg shadow" />
+                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <FavoriteButton photoId={photo.id} initialFavorited={favoritePhotoIds.has(photo.id)} />
+                </div>
               </div>
             ))}
           </div>

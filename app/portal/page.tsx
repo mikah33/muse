@@ -30,7 +30,9 @@ export default async function CustomerPortalPage() {
           <Link href="/" className="font-serif text-2xl tracking-widest">
             MODEL MUSE
           </Link>
-          <div className="flex items-center gap-4 text-sm">
+          <div className="flex items-center gap-6 text-sm">
+            <Link href="/portal" className="border-b-2 border-white pb-1">Galleries</Link>
+            <Link href="/portal/favorites" className="hover:text-gray-300">Favorites</Link>
             <span>{userInfo?.full_name}</span>
             <form action="/api/auth/signout" method="post">
               <button className="px-4 py-2 border border-gray-600 hover:bg-gray-800">
