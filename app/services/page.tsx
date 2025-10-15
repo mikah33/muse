@@ -1,4 +1,4 @@
-import Header from '@/components/shared/Header'
+import HeaderWrapper from '@/components/shared/HeaderWrapper'
 import Footer from '@/components/shared/Footer'
 import Hero from '@/components/shared/Hero'
 import Link from 'next/link'
@@ -152,7 +152,7 @@ const services = [
 export default function ServicesPage() {
   return (
     <>
-      <Header />
+      <HeaderWrapper />
       <main>
         <Hero
           title="Professional Photography"

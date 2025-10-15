@@ -1,10 +1,10 @@
-import Header from '@/components/shared/Header'
+import HeaderWrapper from '@/components/shared/HeaderWrapper'
 import Footer from '@/components/shared/Footer'
 
 export default function TermsPage() {
   return (
     <>
-      <Header />
+      <HeaderWrapper />
       <div className="min-h-screen bg-white">
         {/* Hero */}
         <div className="bg-charcoal text-white py-32 px-8 pt-40">

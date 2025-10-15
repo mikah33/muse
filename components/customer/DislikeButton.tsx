@@ -1,22 +1,22 @@
 'use client'
 
 import { useState } from 'react'
-import { Heart } from 'lucide-react'
+import { ThumbsDown } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
-interface FavoriteButtonProps {
+interface DislikeButtonProps {
   photoId: string
-  isFavorited: boolean
-  onToggle: (photoId: string, isFavorited: boolean) => void
+  isDisliked: boolean
+  onToggle: (photoId: string, isDisliked: boolean) => void
   size?: 'sm' | 'md' | 'lg'
 }
 
-export default function FavoriteButton({
+export default function DislikeButton({
   photoId,
-  isFavorited,
+  isDisliked,
   onToggle,
   size = 'md',
-}: FavoriteButtonProps) {
+}: DislikeButtonProps) {
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
 
@@ -38,31 +38,31 @@ export default function FavoriteButton({
     if (loading) return
 
     setLoading(true)
-    console.log('Favorite button clicked:', { photoId, isFavorited })
+    console.log('Dislike button clicked:', { photoId, isDisliked })
 
     try {
-      if (isFavorited) {
-        // Remove favorite
-        console.log('Removing favorite...')
+      if (isDisliked) {
+        // Remove dislike
+        console.log('Removing dislike...')
         const { data, error } = await supabase
-          .from('favorites')
+          .from('dislikes')
           .delete()
           .eq('photo_id', photoId)
 
         console.log('Delete result:', { data, error })
         if (error) throw error
         onToggle(photoId, false)
-        console.log('Favorite removed successfully')
+        console.log('Dislike removed successfully')
       } else {
-        // Add favorite
+        // Add dislike
         const { data: { user } } = await supabase.auth.getUser()
         console.log('Current user:', user?.id)
 
         if (!user) throw new Error('Not authenticated')
 
-        console.log('Adding favorite...')
+        console.log('Adding dislike...')
         const { data, error } = await supabase
-          .from('favorites')
+          .from('dislikes')
           .insert({
             customer_id: user.id,
             photo_id: photoId,
@@ -71,10 +71,10 @@ export default function FavoriteButton({
         console.log('Insert result:', { data, error })
         if (error) throw error
         onToggle(photoId, true)
-        console.log('Favorite added successfully')
+        console.log('Dislike added successfully')
       }
     } catch (error) {
-      console.error('Error toggling favorite:', error)
+      console.error('Error toggling dislike:', error)
       alert('Error: ' + (error as Error).message)
     } finally {
       setLoading(false)
@@ -93,13 +93,13 @@ export default function FavoriteButton({
         disabled:opacity-50 disabled:cursor-not-allowed
         shadow-lg
       `}
-      aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+      aria-label={isDisliked ? 'Remove dislike' : 'Mark as disliked'}
     >
-      <Heart
+      <ThumbsDown
         className={`
           ${sizeClasses[size]}
           transition-all duration-200
-          ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-700'}
+          ${isDisliked ? 'fill-red-500 text-red-500' : 'text-gray-700'}
         `}
       />
     </button>

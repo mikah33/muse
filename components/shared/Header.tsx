@@ -3,7 +3,20 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
-export default function Header() {
+interface CustomPage {
+  id: string
+  title: string
+  slug: string
+  show_in_header: boolean
+  show_in_mobile_menu: boolean
+  order_position: number
+}
+
+interface HeaderProps {
+  customPages?: CustomPage[]
+}
+
+export default function Header({ customPages = [] }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -16,7 +29,9 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const navItems = ['About', 'Services', 'Portfolio', 'Blog', 'Contact']
+  const defaultNavItems = ['About', 'Services', 'Portfolio', 'Blog', 'Contact']
+  const headerCustomPages = customPages.filter(p => p.show_in_header)
+  const mobileCustomPages = customPages.filter(p => p.show_in_mobile_menu)
 
   return (
     <header
@@ -40,7 +55,7 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <ul className="hidden lg:flex items-center space-x-12">
-            {navItems.map((item) => (
+            {defaultNavItems.map((item) => (
               <li key={item}>
                 <Link
                   href={`/${item.toLowerCase()}`}
@@ -49,6 +64,18 @@ export default function Header() {
                   }`}
                 >
                   {item}
+                </Link>
+              </li>
+            ))}
+            {headerCustomPages.map((page) => (
+              <li key={page.id}>
+                <Link
+                  href={`/${page.slug}`}
+                  className={`text-sm tracking-widest uppercase transition-all duration-300 hover:opacity-70 ${
+                    scrolled ? 'text-black' : 'text-white'
+                  }`}
+                >
+                  {page.title}
                 </Link>
               </li>
             ))}
@@ -102,7 +129,7 @@ export default function Header() {
       {mobileMenuOpen && (
         <div className="lg:hidden fixed top-20 left-0 right-0 bg-white shadow-lg z-40 max-w-full">
           <ul className="flex flex-col py-4">
-            {navItems.map((item) => (
+            {defaultNavItems.map((item) => (
               <li key={item}>
                 <Link
                   href={`/${item.toLowerCase()}`}
@@ -110,6 +137,17 @@ export default function Header() {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {item}
+                </Link>
+              </li>
+            ))}
+            {mobileCustomPages.map((page) => (
+              <li key={page.id}>
+                <Link
+                  href={`/${page.slug}`}
+                  className="block px-6 py-3 text-sm tracking-widest uppercase text-black hover:bg-gray-100"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {page.title}
                 </Link>
               </li>
             ))}

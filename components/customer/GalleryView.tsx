@@ -7,13 +7,14 @@ import type { Gallery, Photo, User } from '@/types/database'
 import GalleryGrid from './GalleryGrid'
 import PhotoLightbox from './PhotoLightbox'
 
-interface PhotoWithFavorite extends Photo {
+interface PhotoWithReactions extends Photo {
   is_favorited: boolean
+  is_disliked: boolean
 }
 
 interface GalleryViewProps {
   gallery: Gallery
-  photos: PhotoWithFavorite[]
+  photos: PhotoWithReactions[]
   user: User
 }
 
@@ -35,6 +36,14 @@ export default function GalleryView({
     setPhotosState((prev) =>
       prev.map((photo) =>
         photo.id === photoId ? { ...photo, is_favorited: isFavorited } : photo
+      )
+    )
+  }
+
+  const handleDislikeToggle = (photoId: string, isDisliked: boolean) => {
+    setPhotosState((prev) =>
+      prev.map((photo) =>
+        photo.id === photoId ? { ...photo, is_disliked: isDisliked } : photo
       )
     )
   }
@@ -111,6 +120,7 @@ export default function GalleryView({
             photos={photosState}
             onPhotoClick={handlePhotoClick}
             onFavoriteToggle={handleFavoriteToggle}
+            onDislikeToggle={handleDislikeToggle}
           />
         )}
       </div>
@@ -123,6 +133,7 @@ export default function GalleryView({
           onClose={() => setLightboxOpen(false)}
           onIndexChange={setCurrentPhotoIndex}
           onFavoriteToggle={handleFavoriteToggle}
+          onDislikeToggle={handleDislikeToggle}
         />
       )}
     </div>

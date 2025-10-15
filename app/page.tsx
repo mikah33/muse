@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import Header from '@/components/shared/Header'
+import HeaderWrapper from '@/components/shared/HeaderWrapper'
 import Footer from '@/components/shared/Footer'
 import Hero from '@/components/shared/Hero'
 import Services from '@/components/shared/Services'
@@ -12,7 +12,7 @@ import CTASection from '@/components/shared/CTASection'
 export default function Home() {
   return (
     <>
-      <Header />
+      <HeaderWrapper />
       <main>
         <Hero />
         <AboutSection />

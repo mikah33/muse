@@ -1,4 +1,4 @@
-import Header from '@/components/shared/Header'
+import HeaderWrapper from '@/components/shared/HeaderWrapper'
 import Footer from '@/components/shared/Footer'
 import Hero from '@/components/shared/Hero'
 import Link from 'next/link'
@@ -6,7 +6,7 @@ import Link from 'next/link'
 export default function AboutPage() {
   return (
     <>
-      <Header />
+      <HeaderWrapper />
       <main>
         <Hero
           title="More Than Just"

@@ -2,20 +2,23 @@
 
 import { useEffect } from 'react'
 import Image from 'next/image'
-import { X, ChevronLeft, ChevronRight, Download } from 'lucide-react'
+import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 import type { Photo } from '@/types/database'
 import FavoriteButton from './FavoriteButton'
+import DislikeButton from './DislikeButton'
 
-interface PhotoWithFavorite extends Photo {
+interface PhotoWithReactions extends Photo {
   is_favorited: boolean
+  is_disliked: boolean
 }
 
 interface PhotoLightboxProps {
-  photos: PhotoWithFavorite[]
+  photos: PhotoWithReactions[]
   currentIndex: number
   onClose: () => void
   onIndexChange: (index: number) => void
   onFavoriteToggle: (photoId: string, isFavorited: boolean) => void
+  onDislikeToggle: (photoId: string, isDisliked: boolean) => void
 }
 
 export default function PhotoLightbox({
@@ -24,6 +27,7 @@ export default function PhotoLightbox({
   onClose,
   onIndexChange,
   onFavoriteToggle,
+  onDislikeToggle,
 }: PhotoLightboxProps) {
   const currentPhoto = photos[currentIndex]
   const hasPrevious = currentIndex > 0
@@ -53,13 +57,23 @@ export default function PhotoLightbox({
     }
   }, [])
 
-  const handleDownload = () => {
-    const link = document.createElement('a')
-    link.href = currentPhoto.photo_url
-    link.download = currentPhoto.title || `photo-${currentIndex + 1}`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(currentPhoto.photo_url)
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = currentPhoto.title || `photo-${currentIndex + 1}.jpg`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Error downloading photo:', error)
+      // Fallback: open in new tab if fetch fails
+      window.open(currentPhoto.photo_url, '_blank')
+    }
   }
 
   return (
@@ -132,19 +146,43 @@ export default function PhotoLightbox({
 
           {/* Action Buttons */}
           <div className="flex items-center space-x-3">
+            {/* Download Button - Chrome Style */}
+            <button
+              onClick={handleDownload}
+              className="p-3 bg-white/10 backdrop-blur-sm rounded hover:bg-white/20 transition-colors group"
+              aria-label="Download photo"
+              title="Download"
+            >
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16"
+                />
+              </svg>
+            </button>
+
+            {/* Favorite Button */}
             <FavoriteButton
               photoId={currentPhoto.id}
               isFavorited={currentPhoto.is_favorited}
               onToggle={onFavoriteToggle}
               size="lg"
             />
-            <button
-              onClick={handleDownload}
-              className="p-2.5 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white hover:scale-110 transition-all duration-200 shadow-lg"
-              aria-label="Download photo"
-            >
-              <Download className="w-6 h-6 text-gray-700" />
-            </button>
+
+            {/* Dislike Button */}
+            <DislikeButton
+              photoId={currentPhoto.id}
+              isDisliked={currentPhoto.is_disliked}
+              onToggle={onDislikeToggle}
+              size="lg"
+            />
           </div>
         </div>
       </div>

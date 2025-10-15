@@ -17,6 +17,7 @@ export default function AdminNav({ userEmail }: AdminNavProps) {
     { href: '/admin/blog', label: 'Blog' },
     { href: '/admin/portfolio', label: 'Portfolio' },
     { href: '/admin/customers', label: 'Customers' },
+    { href: '/admin/pages', label: 'Custom Pages' },
     { href: '/admin/settings', label: 'Settings' },
   ]
 

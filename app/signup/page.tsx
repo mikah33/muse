@@ -1,4 +1,4 @@
-import Header from '@/components/shared/Header'
+import HeaderWrapper from '@/components/shared/HeaderWrapper'
 import Footer from '@/components/shared/Footer'
 import SignupForm from '@/components/auth/SignupForm'
 
@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'
 export default function SignupPage() {
   return (
     <>
-      <Header />
+      <HeaderWrapper />
       <main className="min-h-screen bg-gray-50 py-24 px-6">
         <div className="max-w-md mx-auto">
           <div className="text-center mb-8">

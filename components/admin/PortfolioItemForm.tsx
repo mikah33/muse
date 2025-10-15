@@ -52,10 +52,13 @@ export default function PortfolioItemForm({ item }: PortfolioItemFormProps) {
     }))
   }
 
-  // Upload image to Supabase Storage
+  // Upload multiple images to Supabase Storage
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const files = Array.from(e.target.files || [])
+    if (files.length === 0) return
+
+    // For single item form, only take the first file
+    const file = files[0]
 
     // Accept image files and RAW formats
     const validTypes = ['image/', '.cr2', '.cr3', '.nef', '.arw', '.dng', '.orf', '.rw2', '.pef', '.raf']
@@ -240,6 +243,7 @@ export default function PortfolioItemForm({ item }: PortfolioItemFormProps) {
             ref={fileInputRef}
             type="file"
             accept="image/*,.cr2,.cr3,.nef,.arw,.dng,.orf,.rw2,.pef,.raf"
+            multiple
             onChange={handleImageUpload}
             className="hidden"
           />
@@ -252,7 +256,7 @@ export default function PortfolioItemForm({ item }: PortfolioItemFormProps) {
             {uploading ? 'Uploading...' : formData.image_url ? 'Change Image' : 'Upload Image'}
           </button>
           <p className="text-sm text-gray-500 mt-1">
-            Max 50MB. Accepts JPG, PNG, and RAW formats (CR2, CR3, NEF, ARW, DNG, ORF, RW2, PEF, RAF)
+            Max 50MB per file. Accepts JPG, PNG, and RAW formats. Select multiple files to upload (first file will be used for this portfolio item)
           </p>
         </div>
 

@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import DeleteButton from '@/components/admin/DeleteButton'
+import CustomerReactionsView from '@/components/admin/CustomerReactionsView'
 
 export default async function CustomerDetailPage({
   params,
@@ -10,6 +11,19 @@ export default async function CustomerDetailPage({
 }) {
   const { id } = await params
   const supabase = await createClient()
+
+  // Check who is logged in
+  const { data: { user: currentUser } } = await supabase.auth.getUser()
+  console.log('Current logged in user:', currentUser?.id)
+
+  // Get current user's role
+  const { data: currentUserData } = await supabase
+    .from('users')
+    .select('role, email')
+    .eq('id', currentUser?.id)
+    .single()
+
+  console.log('Current user role:', currentUserData?.role, 'email:', currentUserData?.email)
 
   const { data: customer } = await supabase
     .from('users')
@@ -22,12 +36,73 @@ export default async function CustomerDetailPage({
     notFound()
   }
 
+  console.log('Viewing customer:', customer.id, customer.email)
+
   // Fetch galleries for this customer
   const { data: galleries } = await supabase
     .from('galleries')
     .select('*')
     .eq('customer_id', customer.id)
     .order('created_at', { ascending: false })
+
+  // Use service role client for admin queries (bypasses RLS)
+  const supabaseAdmin = createServiceClient()
+
+  // Fetch customer favorites - simplified approach
+  const { data: favoritesRaw, error: favError } = await supabaseAdmin
+    .from('favorites')
+    .select('favorited_at, photo_id')
+    .eq('customer_id', customer.id)
+    .order('favorited_at', { ascending: false })
+
+  console.log('Server-side favorites raw:', JSON.stringify(favoritesRaw), 'Error:', JSON.stringify(favError))
+
+  // Fetch customer dislikes
+  const { data: dislikesRaw, error: disError } = await supabaseAdmin
+    .from('dislikes')
+    .select('created_at, photo_id')
+    .eq('customer_id', customer.id)
+    .order('created_at', { ascending: false })
+
+  console.log('Server-side dislikes raw:', JSON.stringify(dislikesRaw), 'Error:', JSON.stringify(disError))
+
+  // Fetch photo details separately
+  let favorites: any[] = []
+  if (favoritesRaw && favoritesRaw.length > 0) {
+    const favoritePhotoIds = favoritesRaw.map(f => f.photo_id)
+    const { data: favoritePhotos } = await supabaseAdmin
+      .from('photos')
+      .select('id, photo_url, thumbnail_url, title, description, gallery_id, galleries(gallery_name)')
+      .in('id', favoritePhotoIds)
+
+    console.log('Favorite photos fetched:', JSON.stringify(favoritePhotos))
+
+    favorites = (favoritePhotos || []).map((photo: any) => ({
+      ...photo,
+      galleries: photo.galleries || { gallery_name: 'Unknown' },
+      reaction_date: favoritesRaw.find(f => f.photo_id === photo.id)?.favorited_at || new Date().toISOString(),
+    }))
+  }
+
+  let dislikes: any[] = []
+  if (dislikesRaw && dislikesRaw.length > 0) {
+    const dislikePhotoIds = dislikesRaw.map(d => d.photo_id)
+    const { data: dislikePhotos } = await supabaseAdmin
+      .from('photos')
+      .select('id, photo_url, thumbnail_url, title, description, gallery_id, galleries(gallery_name)')
+      .in('id', dislikePhotoIds)
+
+    console.log('Dislike photos fetched:', JSON.stringify(dislikePhotos))
+
+    dislikes = (dislikePhotos || []).map((photo: any) => ({
+      ...photo,
+      galleries: photo.galleries || { gallery_name: 'Unknown' },
+      reaction_date: dislikesRaw.find(d => d.photo_id === photo.id)?.created_at || new Date().toISOString(),
+    }))
+  }
+
+  console.log('Formatted favorites count:', favorites.length, 'items:', JSON.stringify(favorites))
+  console.log('Formatted dislikes count:', dislikes.length, 'items:', JSON.stringify(dislikes))
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
@@ -81,6 +156,16 @@ export default async function CustomerDetailPage({
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Customer Reactions (Favorites & Dislikes) */}
+        <div className="mb-6 md:mb-8">
+          <h2 className="text-lg md:text-xl font-semibold mb-4">Customer Reactions</h2>
+          <CustomerReactionsView
+            customerId={customer.id}
+            initialFavorites={favorites}
+            initialDislikes={dislikes}
+          />
         </div>
 
         {/* Galleries */}

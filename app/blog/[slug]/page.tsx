@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
-import Header from '@/components/shared/Header'
+import HeaderWrapper from '@/components/shared/HeaderWrapper'
 import Footer from '@/components/shared/Footer'
 import { createClient } from '@/lib/supabase/server'
 
@@ -40,7 +40,7 @@ export default async function BlogPostPage({
 
   return (
     <>
-      <Header />
+      <HeaderWrapper />
       <article className="min-h-screen bg-white pt-20">
         {/* Hero Image */}
         {post.featured_image && (

@@ -58,7 +58,7 @@ export default async function AdminPage() {
               <HeroImageUpload currentImage={currentHeroImage} />
               <Link
                 href="/admin/settings"
-                className="inline-block mt-4 text-sm text-blue-600 hover:text-blue-800"
+                className="inline-block mt-4 text-sm text-black hover:text-gray-700 underline"
               >
                 Go to Settings →
               </Link>
@@ -68,37 +68,60 @@ export default async function AdminPage() {
 
         {/* Management Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          <Link
-            href="/admin/blog"
-            className="bg-white rounded-lg shadow border-l-4 border-blue-500 p-4 md:p-6 hover:bg-gray-50 transition-colors"
-          >
+          <div className="bg-white rounded-lg shadow p-4 md:p-6">
             <h2 className="text-lg md:text-xl font-semibold mb-2">Blog Management</h2>
-            <p className="text-sm text-gray-600">Create and manage blog posts</p>
-          </Link>
+            <p className="text-sm text-gray-600 mb-4">Create and manage blog posts</p>
+            <Link
+              href="/admin/blog"
+              className="inline-block px-6 py-2 bg-black text-white text-sm tracking-wider hover:bg-gray-800 transition-colors"
+            >
+              MANAGE BLOG
+            </Link>
+          </div>
 
-          <Link
-            href="/admin/portfolio"
-            className="bg-white rounded-lg shadow border-l-4 border-purple-500 p-4 md:p-6 hover:bg-gray-50 transition-colors"
-          >
+          <div className="bg-white rounded-lg shadow p-4 md:p-6">
             <h2 className="text-lg md:text-xl font-semibold mb-2">Portfolio Management</h2>
-            <p className="text-sm text-gray-600">Upload and manage portfolio items</p>
-          </Link>
+            <p className="text-sm text-gray-600 mb-4">Upload and manage portfolio items</p>
+            <Link
+              href="/admin/portfolio"
+              className="inline-block px-6 py-2 bg-black text-white text-sm tracking-wider hover:bg-gray-800 transition-colors"
+            >
+              MANAGE PORTFOLIO
+            </Link>
+          </div>
 
-          <Link
-            href="/admin/customers"
-            className="bg-white rounded-lg shadow border-l-4 border-green-500 p-4 md:p-6 hover:bg-gray-50 transition-colors"
-          >
+          <div className="bg-white rounded-lg shadow p-4 md:p-6">
             <h2 className="text-lg md:text-xl font-semibold mb-2">Customer Management</h2>
-            <p className="text-sm text-gray-600">Create and manage customer accounts</p>
-          </Link>
+            <p className="text-sm text-gray-600 mb-4">Create and manage customer accounts & galleries</p>
+            <Link
+              href="/admin/customers"
+              className="inline-block px-6 py-2 bg-black text-white text-sm tracking-wider hover:bg-gray-800 transition-colors"
+            >
+              MANAGE CUSTOMERS
+            </Link>
+          </div>
 
-          <Link
-            href="/admin/settings"
-            className="bg-white rounded-lg shadow border-l-4 border-orange-500 p-4 md:p-6 hover:bg-gray-50 transition-colors"
-          >
+          <div className="bg-white rounded-lg shadow p-4 md:p-6">
+            <h2 className="text-lg md:text-xl font-semibold mb-2">Custom Pages</h2>
+            <p className="text-sm text-gray-600 mb-4">Create custom pages for your site navigation</p>
+            <Link
+              href="/admin/pages"
+              className="inline-block px-6 py-2 bg-black text-white text-sm tracking-wider hover:bg-gray-800 transition-colors"
+            >
+              MANAGE PAGES
+            </Link>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-4 md:p-6">
             <h2 className="text-lg md:text-xl font-semibold mb-2">Site Settings</h2>
-            <p className="text-sm text-gray-600">Manage site configuration</p>
-          </Link>
+            <p className="text-sm text-gray-600 mb-4">Manage site configuration</p>
+            <Link
+              href="/admin/settings"
+              className="inline-block px-6 py-2 bg-black text-white text-sm tracking-wider hover:bg-gray-800 transition-colors"
+            >
+              SETTINGS
+            </Link>
+          </div>
         </div>
       </div>
     </div>

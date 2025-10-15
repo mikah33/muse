@@ -37,6 +37,7 @@ export default function BlogPostForm({ post }: BlogPostFormProps) {
     category: post?.category || '',
     published: post?.published || false,
   })
+  const [useRichText, setUseRichText] = useState(false)
 
   // Auto-generate slug from title
   const handleTitleChange = (title: string) => {
@@ -318,22 +319,60 @@ export default function BlogPostForm({ post }: BlogPostFormProps) {
 
         {/* Content */}
         <div>
-          <label className="block text-sm font-medium mb-2">
-            Content (HTML) *
-          </label>
-          <textarea
-            value={formData.content}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, content: e.target.value }))
-            }
-            required
-            rows={15}
-            className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none font-mono text-sm"
-            placeholder="<p>Your blog content here...</p>"
-          />
-          <p className="text-sm text-gray-500 mt-1">
-            You can use HTML: &lt;p&gt;, &lt;h2&gt;, &lt;img&gt;, etc.
-          </p>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-sm font-medium">
+              Content *
+            </label>
+            <button
+              type="button"
+              onClick={() => setUseRichText(!useRichText)}
+              className="text-xs text-blue-600 hover:text-blue-800"
+            >
+              Switch to {useRichText ? 'Plain Text' : 'HTML'} Mode
+            </button>
+          </div>
+
+          {!useRichText ? (
+            <>
+              <textarea
+                value={formData.content}
+                onChange={(e) => {
+                  const text = e.target.value
+                  // Auto-convert plain text to HTML paragraphs
+                  const htmlContent = text
+                    .split('\n\n')
+                    .map(para => para.trim())
+                    .filter(para => para.length > 0)
+                    .map(para => `<p>${para.replace(/\n/g, '<br>')}</p>`)
+                    .join('\n\n')
+                  setFormData((prev) => ({ ...prev, content: htmlContent }))
+                }}
+                required
+                rows={15}
+                className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none"
+                placeholder="Write your blog content here. Paragraphs will be automatically formatted. Use double line breaks for new paragraphs."
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                Plain text mode - paragraphs will be automatically formatted as HTML
+              </p>
+            </>
+          ) : (
+            <>
+              <textarea
+                value={formData.content}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, content: e.target.value }))
+                }
+                required
+                rows={15}
+                className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none font-mono text-sm"
+                placeholder="<p>Your blog content here...</p>"
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                HTML mode - You can use HTML: &lt;p&gt;, &lt;h2&gt;, &lt;img&gt;, etc.
+              </p>
+            </>
+          )}
         </div>
 
         {/* Published */}

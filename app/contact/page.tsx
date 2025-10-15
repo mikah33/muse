@@ -1,10 +1,10 @@
-import Header from '@/components/shared/Header'
+import HeaderWrapper from '@/components/shared/HeaderWrapper'
 import Footer from '@/components/shared/Footer'
 
 export default function ContactPage() {
   return (
     <>
-      <Header />
+      <HeaderWrapper />
       <div className="min-h-screen bg-white">
         {/* Hero */}
         <div className="bg-charcoal text-white py-24 md:py-32 px-6 md:px-8 pt-32 md:pt-40">

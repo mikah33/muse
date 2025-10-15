@@ -20,12 +20,20 @@ export default async function AdminPortfolioPage() {
             <h1 className="text-3xl font-serif mb-2">Portfolio</h1>
             <p className="text-gray-600">Manage your portfolio items</p>
           </div>
-          <Link
-            href="/admin/portfolio/new"
-            className="px-6 py-3 bg-black text-white tracking-wider hover:bg-gray-900 transition-colors"
-          >
-            ADD NEW ITEM
-          </Link>
+          <div className="flex gap-3">
+            <Link
+              href="/admin/portfolio/bulk-upload"
+              className="px-6 py-3 border-2 border-black text-black tracking-wider hover:bg-black hover:text-white transition-colors"
+            >
+              BULK UPLOAD
+            </Link>
+            <Link
+              href="/admin/portfolio/new"
+              className="px-6 py-3 bg-black text-white tracking-wider hover:bg-gray-800 transition-colors"
+            >
+              ADD NEW ITEM
+            </Link>
+          </div>
         </div>
 
         {/* Items Grid */}
@@ -55,12 +63,12 @@ export default async function AdminPortfolioPage() {
                     className="object-cover"
                   />
                   {item.is_featured && (
-                    <div className="absolute top-2 left-2 px-2 py-1 bg-yellow-400 text-black text-xs font-bold rounded">
+                    <div className="absolute top-2 left-2 px-2 py-1 bg-black text-white text-xs font-bold rounded">
                       FEATURED
                     </div>
                   )}
                   {!item.published && (
-                    <div className="absolute top-2 right-2 px-2 py-1 bg-red-600 text-white text-xs rounded">
+                    <div className="absolute top-2 right-2 px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded">
                       DRAFT
                     </div>
                   )}
