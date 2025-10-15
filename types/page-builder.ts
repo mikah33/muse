@@ -33,7 +33,7 @@ export interface Visibility {
 // Base PageBlock interface
 export interface PageBlock {
   id: string
-  page_id: string
+  page_id?: string // Optional - only needed for database storage
   block_type: BlockType
   order_position: number
   props: Record<string, any>
