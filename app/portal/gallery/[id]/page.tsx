@@ -5,7 +5,16 @@ import GalleryView from '@/components/customer/GalleryView'
 export default async function CustomerGalleryPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user: authUser } } = await supabase.auth.getUser()
+
+  if (!authUser) redirect('/login')
+
+  // Get full user data from database
+  const { data: user } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', authUser.id)
+    .single()
 
   if (!user) redirect('/login')
 
@@ -13,7 +22,7 @@ export default async function CustomerGalleryPage({ params }: { params: Promise<
     .from('galleries')
     .select('*')
     .eq('id', id)
-    .eq('customer_id', user.id)
+    .eq('customer_id', authUser.id)
     .single()
 
   if (!gallery) notFound()
@@ -28,12 +37,12 @@ export default async function CustomerGalleryPage({ params }: { params: Promise<
   const { data: favorites } = await supabase
     .from('favorites')
     .select('photo_id')
-    .eq('customer_id', user.id)
+    .eq('customer_id', authUser.id)
 
   const { data: dislikes } = await supabase
     .from('dislikes')
     .select('photo_id')
-    .eq('customer_id', user.id)
+    .eq('customer_id', authUser.id)
 
   const favoritePhotoIds = new Set(favorites?.map(f => f.photo_id) || [])
   const dislikePhotoIds = new Set(dislikes?.map(d => d.photo_id) || [])
