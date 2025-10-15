@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Header from '@/components/shared/Header'
 import BlockRenderer from '@/components/page-builder/BlockRenderer'
+import type { SpacingSize } from '@/types/page-builder'
 
 // Make this route dynamic
 export const dynamic = 'force-dynamic'
@@ -49,7 +50,7 @@ export default async function CustomPage({
         block_type: block.type, // Map 'type' to 'block_type'
         props: block.content, // Map 'content' to 'props'
         order_position: index,
-        spacing: { top: 'md', bottom: 'md' },
+        spacing: { top: 'md' as SpacingSize, bottom: 'md' as SpacingSize },
         alignment: block.settings?.alignment || 'left',
         background_color: block.settings?.background || 'white',
       })) : []
