@@ -336,24 +336,16 @@ export default function BlogPostForm({ post }: BlogPostFormProps) {
             <>
               <textarea
                 value={formData.content}
-                onChange={(e) => {
-                  const text = e.target.value
-                  // Auto-convert plain text to HTML paragraphs
-                  const htmlContent = text
-                    .split('\n\n')
-                    .map(para => para.trim())
-                    .filter(para => para.length > 0)
-                    .map(para => `<p>${para.replace(/\n/g, '<br>')}</p>`)
-                    .join('\n\n')
-                  setFormData((prev) => ({ ...prev, content: htmlContent }))
-                }}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, content: e.target.value }))
+                }
                 required
                 rows={15}
                 className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none"
-                placeholder="Write your blog content here. Paragraphs will be automatically formatted. Use double line breaks for new paragraphs."
+                placeholder="Write your blog content here in plain text."
               />
               <p className="text-sm text-gray-500 mt-1">
-                Plain text mode - paragraphs will be automatically formatted as HTML
+                Plain text mode - text will be displayed as-is
               </p>
             </>
           ) : (
