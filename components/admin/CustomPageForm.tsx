@@ -3,12 +3,16 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import PageBuilderEditor from '@/components/page-builder/PageBuilderEditor'
+import type { PageBlock } from '@/types/page-blocks'
 
 interface CustomPage {
   id?: string
   title: string
   slug: string
   content: string
+  content_version?: 'html' | 'blocks'
+  blocks?: string
   published: boolean
   show_in_header: boolean
   show_in_mobile_menu: boolean
@@ -24,7 +28,26 @@ export default function CustomPageForm({ page }: CustomPageFormProps) {
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  // Editor mode state
+  const [useBlockEditor, setUseBlockEditor] = useState(page?.content_version === 'blocks')
   const [useHtml, setUseHtml] = useState(false)
+
+  // Blocks state for PageBuilder
+  const [blocks, setBlocks] = useState<PageBlock[]>(() => {
+    if (page?.blocks) {
+      try {
+        const parsed = typeof page.blocks === 'string'
+          ? JSON.parse(page.blocks)
+          : page.blocks
+        // Blocks are stored as a direct array, not wrapped in an object
+        return Array.isArray(parsed) ? parsed : []
+      } catch {
+        return []
+      }
+    }
+    return []
+  })
 
   const [formData, setFormData] = useState({
     title: page?.title || '',
@@ -54,11 +77,19 @@ export default function CustomPageForm({ page }: CustomPageFormProps) {
     setError('')
 
     try {
+      // Prepare page data based on editor mode
+      const pageData = {
+        ...formData,
+        content_version: useBlockEditor ? 'blocks' : 'html',
+        blocks: useBlockEditor ? blocks : null,
+        content: !useBlockEditor ? formData.content : '',
+      }
+
       if (page?.id) {
         // Update existing page
         const { error: updateError } = await supabase
           .from('custom_pages')
-          .update(formData)
+          .update(pageData)
           .eq('id', page.id)
 
         if (updateError) throw updateError
@@ -66,7 +97,8 @@ export default function CustomPageForm({ page }: CustomPageFormProps) {
         // Create new page
         const { error: insertError } = await supabase
           .from('custom_pages')
-          .insert(formData)
+          .insert(pageData)
+          .select()
 
         if (insertError) throw insertError
       }
@@ -75,7 +107,7 @@ export default function CustomPageForm({ page }: CustomPageFormProps) {
       router.refresh()
     } catch (err: any) {
       console.error('Error saving page:', err)
-      setError(err?.message || 'Failed to save page')
+      setError(err?.message || err?.error_description || err?.code || 'Failed to save page')
     } finally {
       setLoading(false)
     }
@@ -143,50 +175,82 @@ export default function CustomPageForm({ page }: CustomPageFormProps) {
           </p>
         </div>
 
-        {/* Content */}
+        {/* Content Editor */}
         <div>
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-4">
             <label className="block text-sm font-medium">Content *</label>
-            <button
-              type="button"
-              onClick={() => setUseHtml(!useHtml)}
-              className="text-xs text-blue-600 hover:text-blue-800"
-            >
-              Switch to {useHtml ? 'Plain Text' : 'HTML'} Mode
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setUseBlockEditor(!useBlockEditor)
+                  if (!useBlockEditor && blocks.length === 0) {
+                    // Show helpful message when switching to empty block editor
+                    setError('')
+                  }
+                }}
+                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+              >
+                Switch to {useBlockEditor ? 'HTML Editor' : 'Visual Builder'}
+              </button>
+            </div>
           </div>
 
-          {!useHtml ? (
-            <>
-              <textarea
-                value={formData.content}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, content: e.target.value }))
-                }
-                required
-                rows={15}
-                className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none"
-                placeholder="Write your page content here..."
+          {useBlockEditor ? (
+            <div className="border border-gray-300 rounded-lg p-4 bg-gray-50">
+              <PageBuilderEditor
+                initialBlocks={blocks}
+                onBlocksChange={setBlocks}
               />
-              <p className="text-sm text-gray-500 mt-1">
-                Plain text mode - text will be displayed as-is
+              <p className="text-sm text-gray-500 mt-4">
+                Visual block editor - Build your page with drag-and-drop blocks
               </p>
-            </>
+            </div>
           ) : (
             <>
-              <textarea
-                value={formData.content}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, content: e.target.value }))
-                }
-                required
-                rows={15}
-                className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none font-mono text-sm"
-                placeholder="<div>Your HTML content...</div>"
-              />
-              <p className="text-sm text-gray-500 mt-1">
-                HTML mode - Full HTML support
-              </p>
+              <div className="mb-2">
+                <button
+                  type="button"
+                  onClick={() => setUseHtml(!useHtml)}
+                  className="text-xs text-blue-600 hover:text-blue-800"
+                >
+                  Switch to {useHtml ? 'Plain Text' : 'HTML'} Mode
+                </button>
+              </div>
+
+              {!useHtml ? (
+                <>
+                  <textarea
+                    value={formData.content}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, content: e.target.value }))
+                    }
+                    required={!useBlockEditor}
+                    rows={15}
+                    className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none"
+                    placeholder="Write your page content here..."
+                  />
+                  <p className="text-sm text-gray-500 mt-1">
+                    Plain text mode - text will be displayed as-is
+                  </p>
+                </>
+              ) : (
+                <>
+                  <textarea
+                    value={formData.content}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, content: e.target.value }))
+                    }
+                    required={!useBlockEditor}
+                    rows={15}
+                    className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none font-mono text-sm"
+                    placeholder="<div>Your HTML content...</div>"
+                  />
+                  <p className="text-sm text-gray-500 mt-1">
+                    HTML mode - Full HTML support
+                  </p>
+                </>
+              )}
             </>
           )}
         </div>

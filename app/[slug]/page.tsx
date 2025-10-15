@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Header from '@/components/shared/Header'
+import BlockRenderer from '@/components/page-builder/BlockRenderer'
 
 // Make this route dynamic
 export const dynamic = 'force-dynamic'
@@ -32,6 +33,34 @@ export default async function CustomPage({
     notFound()
   }
 
+  // Parse blocks safely if they exist
+  let parsedBlocks = null
+  if (page.content_version === 'blocks' && page.blocks) {
+    try {
+      const rawBlocks = typeof page.blocks === 'string'
+        ? JSON.parse(page.blocks)
+        : page.blocks
+
+      // Transform blocks from editor format to renderer format
+      // Editor saves: {type, content, settings}
+      // Renderer expects: {block_type, props, order_position, spacing, alignment}
+      parsedBlocks = Array.isArray(rawBlocks) ? rawBlocks.map((block: any, index: number) => ({
+        id: block.id,
+        block_type: block.type, // Map 'type' to 'block_type'
+        props: block.content, // Map 'content' to 'props'
+        order_position: index,
+        spacing: { top: 'md', bottom: 'md' },
+        alignment: block.settings?.alignment || 'left',
+        background_color: block.settings?.background || 'white',
+      })) : []
+
+      console.log('Transformed blocks:', parsedBlocks)
+    } catch (error) {
+      console.error('Failed to parse page blocks:', error)
+      // Fall back to content rendering if blocks are invalid
+    }
+  }
+
   return (
     <div className="min-h-screen bg-white">
       <Header customPages={customPages || []} />
@@ -41,10 +70,14 @@ export default async function CustomPage({
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl md:text-5xl font-serif mb-8">{page.title}</h1>
 
-          <div
-            className="prose prose-lg max-w-none"
-            dangerouslySetInnerHTML={{ __html: page.content }}
-          />
+          {page.content_version === 'blocks' && parsedBlocks ? (
+            <BlockRenderer blocks={parsedBlocks} />
+          ) : (
+            <div
+              className="prose prose-lg max-w-none"
+              dangerouslySetInnerHTML={{ __html: page.content }}
+            />
+          )}
         </div>
       </main>
     </div>
