@@ -51,7 +51,7 @@ export default function Hero({
           <ResponsiveHeroImage
             heroData={heroData}
             alt="Professional photography headshots studio creative artistic modeling portfolio"
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover object-center md:object-center"
             priority={true}
           />
         )}

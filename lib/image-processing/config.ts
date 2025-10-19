@@ -2,7 +2,7 @@ import { HeroOptimizerConfig } from './types'
 
 export const HERO_OPTIMIZER_CONFIG: HeroOptimizerConfig = {
   breakpoints: {
-    mobile: { width: 768, height: 1024, quality: 85 },
+    mobile: { width: 768, height: 1280, quality: 85 }, // 3:5 aspect ratio for mobile portrait
     tablet: { width: 1024, height: 768, quality: 85 },
     desktop: { width: 1920, height: 1080, quality: 90 },
   },
