@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import ContactModal from './ContactModal'
+import ResponsiveHeroImage from './ResponsiveHeroImage'
 import { useState, useEffect } from 'react'
+import type { ProcessedImages } from '@/lib/image-processing/types'
 
 interface HeroProps {
   title?: string
@@ -17,7 +18,8 @@ export default function Hero({
   showButtons = true
 }: HeroProps) {
   const [modalOpen, setModalOpen] = useState(false)
-  const [heroImage, setHeroImage] = useState('/images/hero-image.jpg')
+  const [heroData, setHeroData] = useState<ProcessedImages | { url: string } | string>('/images/hero-image.jpg')
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     // Fetch current hero image from settings
@@ -25,25 +27,34 @@ export default function Hero({
       .then(res => res.json())
       .then(data => {
         if (data.url) {
-          setHeroImage(data.url)
+          // Handle both old format (string/url) and new format (ProcessedImages)
+          try {
+            const parsed = typeof data.url === 'string' ? JSON.parse(data.url) : data.url
+            setHeroData(parsed)
+          } catch {
+            setHeroData(data.url)
+          }
         }
+        setIsLoading(false)
       })
-      .catch(err => console.error('Failed to load hero image:', err))
+      .catch(err => {
+        console.error('Failed to load hero image:', err)
+        setIsLoading(false)
+      })
   }, [])
 
   return (
     <section className="relative min-h-screen w-full overflow-hidden">
       {/* Background image with Ken Burns effect */}
       <div className="absolute inset-0 scale-110 animate-ken-burns">
-        <Image
-          src={heroImage}
-          alt="Professional photography headshots studio creative artistic modeling portfolio"
-          fill
-          className="object-cover"
-          priority
-          placeholder="blur"
-          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-        />
+        {!isLoading && (
+          <ResponsiveHeroImage
+            heroData={heroData}
+            alt="Professional photography headshots studio creative artistic modeling portfolio"
+            className="absolute inset-0 w-full h-full object-cover"
+            priority={true}
+          />
+        )}
       </div>
 
       {/* Gradient overlay */}

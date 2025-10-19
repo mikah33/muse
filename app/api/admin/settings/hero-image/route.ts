@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createServerClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { heroOptimizer } from '@/lib/image-processing/hero-optimizer'
+import { MAX_FILE_SIZE, ALLOWED_MIME_TYPES } from '@/lib/image-processing/config'
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,15 +21,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
-    // Generate unique filename
-    const fileExt = file.name.split('.').pop()
-    const fileName = `hero-${Date.now()}.${fileExt}`
+    // Validate file type
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      return NextResponse.json({
+        error: 'Invalid file type. Allowed: JPEG, PNG, WebP'
+      }, { status: 400 })
+    }
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json({
+        error: `File too large. Maximum size: ${MAX_FILE_SIZE / 1024 / 1024}MB`
+      }, { status: 400 })
+    }
 
     // Convert file to buffer
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 
-    // Create service role client for storage and database operations
+    // Process hero image with all variants
+    const processedImages = await heroOptimizer.processHeroImage(buffer, file.name)
+
+    // Create service role client for database operations
     const serviceSupabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -39,30 +54,12 @@ export async function POST(request: NextRequest) {
       }
     )
 
-    // Upload to Supabase Storage using service role
-    const { data: uploadData, error: uploadError } = await serviceSupabase.storage
-      .from('site-images')
-      .upload(fileName, buffer, {
-        contentType: file.type,
-        upsert: false,
-      })
-
-    if (uploadError) {
-      console.error('Upload error:', uploadError)
-      return NextResponse.json({ error: uploadError.message }, { status: 500 })
-    }
-
-    // Get public URL
-    const { data: { publicUrl } } = serviceSupabase.storage
-      .from('site-images')
-      .getPublicUrl(fileName)
-
-    // Update settings table using service role to bypass RLS
+    // Update settings table with all variant URLs
     const { error: updateError } = await serviceSupabase
       .from('site_settings')
       .upsert({
         key: 'hero_image',
-        value: publicUrl,
+        value: JSON.stringify(processedImages),
         updated_by: user.id,
       }, {
         onConflict: 'key'
@@ -75,12 +72,13 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      url: publicUrl
+      data: processedImages,
+      message: 'Hero image processed with responsive variants'
     })
   } catch (error) {
     console.error('Error:', error)
     return NextResponse.json({
-      error: 'Internal server error'
+      error: error instanceof Error ? error.message : 'Internal server error'
     }, { status: 500 })
   }
 }
