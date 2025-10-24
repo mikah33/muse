@@ -54,12 +54,12 @@ export default function Header({ customPages = [] }: HeaderProps) {
           </Link>
 
           {/* Desktop Navigation */}
-          <ul className="hidden lg:flex items-center space-x-12">
+          <ul className="hidden lg:flex items-center space-x-4 xl:space-x-8">
             {defaultNavItems.map((item) => (
               <li key={item}>
                 <Link
                   href={`/${item.toLowerCase()}`}
-                  className={`text-sm tracking-widest uppercase transition-all duration-300 hover:opacity-70 ${
+                  className={`text-xs xl:text-sm tracking-wider xl:tracking-widest uppercase transition-all duration-300 hover:opacity-70 whitespace-nowrap ${
                     scrolled ? 'text-black' : 'text-white'
                   }`}
                 >
@@ -71,7 +71,7 @@ export default function Header({ customPages = [] }: HeaderProps) {
               <li key={page.id}>
                 <Link
                   href={`/${page.slug}`}
-                  className={`text-sm tracking-widest uppercase transition-all duration-300 hover:opacity-70 ${
+                  className={`text-xs xl:text-sm tracking-wider xl:tracking-widest uppercase transition-all duration-300 hover:opacity-70 whitespace-nowrap ${
                     scrolled ? 'text-black' : 'text-white'
                   }`}
                 >
@@ -82,7 +82,7 @@ export default function Header({ customPages = [] }: HeaderProps) {
             <li>
               <Link
                 href="/login"
-                className={`px-6 py-2 text-sm tracking-widest uppercase border transition-all duration-300 ${
+                className={`px-4 xl:px-6 py-2 text-xs xl:text-sm tracking-wider xl:tracking-widest uppercase border transition-all duration-300 whitespace-nowrap ${
                   scrolled
                     ? 'border-black text-black hover:bg-black hover:text-white'
                     : 'border-white text-white hover:bg-white hover:text-black'

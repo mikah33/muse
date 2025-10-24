@@ -14,6 +14,7 @@ export default function AdminNav({ userEmail }: AdminNavProps) {
 
   const navLinks = [
     { href: '/admin', label: 'Dashboard' },
+    { href: '/admin/homepage', label: 'Homepage' },
     { href: '/admin/blog', label: 'Blog' },
     { href: '/admin/portfolio', label: 'Portfolio' },
     { href: '/admin/customers', label: 'Customers' },

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const serviceCategories = [
   {
@@ -68,6 +68,23 @@ const serviceCategories = [
 export default function Services() {
   const [selectedService, setSelectedService] = useState<typeof serviceCategories[0] | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [headerContent, setHeaderContent] = useState({
+    title: "Professional Photography Services",
+    subtitle: "Fayetteville, North Carolina",
+    description: "Model Muse Studio is Fayetteville's premier photography studio specializing in professional model portfolios, actor headshots, business portraits, and creative photography serving Cumberland County, Fort Liberty, Hope Mills, Raeford, and surrounding North Carolina areas.",
+    subdescription: "Comprehensive photography services for models, actors, military families, and professionals including professional headshots, portfolio photography, comp card design, and creative portraits in Fayetteville NC."
+  })
+
+  useEffect(() => {
+    fetch('/api/admin/homepage')
+      .then(res => res.json())
+      .then(data => {
+        if (data.services_header) {
+          setHeaderContent(data.services_header)
+        }
+      })
+      .catch(err => console.error('Failed to load services header:', err))
+  }, [])
 
   const handleServiceClick = (service: typeof serviceCategories[0]) => {
     setIsLoading(true)
@@ -82,14 +99,14 @@ export default function Services() {
       <section className="py-12 md:py-20 lg:py-32 px-4 md:px-6 lg:px-12 max-w-7xl mx-auto">
         <div className="mb-12 md:mb-20 text-center">
           <h2 className="font-serif text-3xl md:text-5xl lg:text-6xl mb-3 md:mb-4">
-            Professional Photography Services
-            <span className="block text-xl md:text-3xl lg:text-4xl italic font-light mt-2 md:mt-3 text-gray-700">Fayetteville, North Carolina</span>
+            {headerContent.title}
+            <span className="block text-xl md:text-3xl lg:text-4xl italic font-light mt-2 md:mt-3 text-gray-700">{headerContent.subtitle}</span>
           </h2>
           <p className="text-base md:text-lg text-gray-700 max-w-3xl mx-auto mt-4 md:mt-6 mb-3 md:mb-4 hidden md:block">
-            Model Muse Studio is Fayetteville's premier photography studio specializing in professional model portfolios, actor headshots, business portraits, and creative photography serving Cumberland County, Fort Liberty, Hope Mills, Raeford, and surrounding North Carolina areas.
+            {headerContent.description}
           </p>
           <p className="text-sm md:text-base text-gray-600 max-w-3xl mx-auto mb-6 md:mb-8 hidden md:block">
-            Comprehensive photography services for models, actors, military families, and professionals including professional headshots, portfolio photography, comp card design, and creative portraits in Fayetteville NC.
+            {headerContent.subdescription}
           </p>
           <div className="w-16 md:w-24 h-px bg-black mx-auto"></div>
         </div>
