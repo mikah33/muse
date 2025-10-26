@@ -63,7 +63,7 @@ export default function Footer() {
               <h4 className="text-xs tracking-[0.2em] mb-2">CONNECT</h4>
               <div className="flex space-x-2 mb-3">
                 <a
-                  href="https://www.instagram.com/modelmusestudio"
+                  href="https://www.instagram.com/model.muse.studio"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-7 h-7 border border-gray-700 flex items-center justify-center hover:border-white hover:bg-white group transition-all"

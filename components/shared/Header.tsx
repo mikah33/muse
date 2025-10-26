@@ -19,6 +19,7 @@ interface HeaderProps {
 export default function Header({ customPages = [] }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [pagesDropdownOpen, setPagesDropdownOpen] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,6 +33,16 @@ export default function Header({ customPages = [] }: HeaderProps) {
   const defaultNavItems = ['About', 'Services', 'Portfolio', 'Blog', 'Contact']
   const headerCustomPages = customPages.filter(p => p.show_in_header)
   const mobileCustomPages = customPages.filter(p => p.show_in_mobile_menu)
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      if (pagesDropdownOpen) setPagesDropdownOpen(false)
+    }
+
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [pagesDropdownOpen])
 
   return (
     <header
@@ -67,18 +78,54 @@ export default function Header({ customPages = [] }: HeaderProps) {
                 </Link>
               </li>
             ))}
-            {headerCustomPages.map((page) => (
-              <li key={page.id}>
-                <Link
-                  href={`/${page.slug}`}
-                  className={`text-xs xl:text-sm tracking-wider xl:tracking-widest uppercase transition-all duration-300 hover:opacity-70 whitespace-nowrap ${
+
+            {/* Pages Dropdown */}
+            {headerCustomPages.length > 0 && (
+              <li className="relative">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setPagesDropdownOpen(!pagesDropdownOpen)
+                  }}
+                  className={`text-xs xl:text-sm tracking-wider xl:tracking-widest uppercase transition-all duration-300 hover:opacity-70 whitespace-nowrap flex items-center gap-1 ${
                     scrolled ? 'text-black' : 'text-white'
                   }`}
                 >
-                  {page.title}
-                </Link>
+                  Pages
+                  <svg
+                    className={`w-4 h-4 transition-transform duration-200 ${
+                      pagesDropdownOpen ? 'rotate-180' : ''
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {pagesDropdownOpen && (
+                  <div className="absolute top-full left-0 mt-2 min-w-[200px] bg-white shadow-lg rounded-md py-2 z-50">
+                    {headerCustomPages.map((page) => (
+                      <Link
+                        key={page.id}
+                        href={`/${page.slug}`}
+                        className="block px-4 py-2 text-xs xl:text-sm tracking-wider uppercase text-black hover:bg-gray-100 transition-colors whitespace-nowrap"
+                        onClick={() => setPagesDropdownOpen(false)}
+                      >
+                        {page.title}
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </li>
-            ))}
+            )}
+
             <li>
               <Link
                 href="/login"
