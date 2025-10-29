@@ -18,8 +18,8 @@ export default function Hero({
   showButtons = true
 }: HeroProps) {
   const [modalOpen, setModalOpen] = useState(false)
-  const [heroData, setHeroData] = useState<ProcessedImages | { url: string } | string>('/images/hero-image.jpg')
-  const [isLoading, setIsLoading] = useState(true)
+  const [heroData, setHeroData] = useState<ProcessedImages | { url: string } | string>('/images/hero-backup.jpg')
+  const [isLoading, setIsLoading] = useState(false) // Start with false to show placeholder immediately
   const [content, setContent] = useState({
     title: propTitle || "Professional Photography",
     subtitle: propSubtitle || "Headshots & Portfolios",
@@ -30,12 +30,10 @@ export default function Hero({
   })
 
   useEffect(() => {
-    // Fetch current hero image from settings
-    Promise.all([
-      fetch('/api/settings/hero-image').then(res => res.json()),
-      fetch('/api/admin/homepage').then(res => res.json())
-    ])
-      .then(([imageData, homepageData]) => {
+    // Load hero image and content in parallel
+    const imagePromise = fetch('/api/settings/hero-image')
+      .then(res => res.json())
+      .then(imageData => {
         if (imageData.url) {
           try {
             const parsed = typeof imageData.url === 'string' ? JSON.parse(imageData.url) : imageData.url
@@ -44,29 +42,32 @@ export default function Hero({
             setHeroData(imageData.url)
           }
         }
+      })
+
+    const contentPromise = fetch('/api/admin/homepage')
+      .then(res => res.json())
+      .then(homepageData => {
         if (homepageData.hero) {
           setContent(homepageData.hero)
         }
-        setIsLoading(false)
       })
-      .catch(err => {
-        console.error('Failed to load hero data:', err)
-        setIsLoading(false)
-      })
+
+    // Don't wait for both, load independently
+    Promise.allSettled([imagePromise, contentPromise]).catch(err => {
+      console.error('Failed to load hero data:', err)
+    })
   }, [])
 
   return (
     <section className="relative min-h-screen w-full overflow-hidden">
       {/* Background image with Ken Burns effect */}
-      <div className="absolute inset-0 scale-110 animate-ken-burns">
-        {!isLoading && (
-          <ResponsiveHeroImage
-            heroData={heroData}
-            alt="Professional photography headshots studio creative artistic modeling portfolio"
-            className="absolute inset-0 w-full h-full object-cover object-center"
-            priority={true}
-          />
-        )}
+      <div className="absolute inset-0 scale-110 animate-ken-burns bg-gray-900">
+        <ResponsiveHeroImage
+          heroData={heroData}
+          alt="Professional photography headshots studio creative artistic modeling portfolio"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          priority={true}
+        />
       </div>
 
       {/* Gradient overlay */}

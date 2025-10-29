@@ -2,15 +2,161 @@ import HeaderWrapper from '@/components/shared/HeaderWrapper'
 import Footer from '@/components/shared/Footer'
 import Hero from '@/components/shared/Hero'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/server'
+import { Metadata } from 'next'
 
-export default function AboutPage() {
+export const metadata: Metadata = {
+  title: 'About Us - Model Muse Studio | Professional Photography Fayetteville NC',
+  description: 'Learn about Model Muse Studio, Fayetteville\'s premier photography studio specializing in model portfolios, professional headshots, and creative portraiture. Serving Fort Bragg, Hope Mills, and Cumberland County NC.',
+  openGraph: {
+    title: 'About Model Muse Studio - Professional Photography Fayetteville NC',
+    description: 'Fayetteville\'s premier photography studio for models, actors, and professionals.',
+    type: 'website',
+  },
+}
+
+export default async function AboutPage() {
+  const supabase = await createClient()
+
+  const aboutSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    mainEntity: {
+      '@type': 'ProfessionalService',
+      '@id': 'https://modelmusestudio.com',
+      name: 'Model Muse Studio',
+      description: 'Professional photography studio specializing in model portfolios, headshots, and creative portraiture in Fayetteville, NC',
+      url: 'https://modelmusestudio.com',
+      telephone: '910-703-7477',
+      email: 'contact@modelmusestudio.com',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Fayetteville',
+        addressRegion: 'NC',
+        addressCountry: 'US',
+      },
+      areaServed: [
+        'Fayetteville',
+        'Fort Bragg',
+        'Hope Mills',
+        'Raeford',
+        'Cumberland County',
+      ],
+      priceRange: '$$',
+    },
+  }
+
+  const localBusinessSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    '@id': 'https://modelmusestudio.com',
+    name: 'Model Muse Studio',
+    image: 'https://modelmusestudio.com/images/logo.png',
+    description: 'Professional photography studio specializing in model portfolios, professional headshots, and creative portraiture in Fayetteville, NC',
+    url: 'https://modelmusestudio.com',
+    telephone: '910-703-7477',
+    email: 'contact@modelmusestudio.com',
+    priceRange: '$$',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: '',
+      addressLocality: 'Fayetteville',
+      addressRegion: 'NC',
+      postalCode: '',
+      addressCountry: 'US',
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: 35.0527,
+      longitude: -78.8784,
+    },
+    openingHoursSpecification: [
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        opens: '09:00',
+        closes: '18:00',
+      },
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: 'Saturday',
+        opens: '10:00',
+        closes: '16:00',
+      },
+    ],
+    sameAs: [
+      'https://www.instagram.com/model.muse.studio/',
+      'https://www.facebook.com/model.muse.studio',
+    ],
+    areaServed: [
+      {
+        '@type': 'City',
+        name: 'Fayetteville',
+        containedInPlace: { '@type': 'State', name: 'North Carolina' },
+      },
+      {
+        '@type': 'Place',
+        name: 'Fort Bragg',
+      },
+      {
+        '@type': 'City',
+        name: 'Hope Mills',
+        containedInPlace: { '@type': 'State', name: 'North Carolina' },
+      },
+      {
+        '@type': 'City',
+        name: 'Raeford',
+        containedInPlace: { '@type': 'State', name: 'North Carolina' },
+      },
+      {
+        '@type': 'AdministrativeArea',
+        name: 'Cumberland County',
+        containedInPlace: { '@type': 'State', name: 'North Carolina' },
+      },
+    ],
+  }
+
+  const { data } = await supabase
+    .from('page_content')
+    .select('content')
+    .eq('page_name', 'about')
+    .single()
+
+  const content = data?.content || {
+    hero: { title: "More Than Just", subtitle: "Photos" },
+    introduction: { paragraph1: "", paragraph2: "", paragraph3: "" },
+    whyChoose: {
+      title: "Why Choose Model Muse Studio?",
+      reason1: { title: "", description: "" },
+      reason2: { title: "", description: "" },
+      reason3: { title: "", description: "" }
+    },
+    whatSetsApart: {
+      title: "What Sets Us Apart?",
+      feature1: { icon: "📸", title: "", description: "" },
+      feature2: { icon: "✨", title: "", description: "" },
+      feature3: { icon: "⚡", title: "", description: "" }
+    },
+    readySection: { title: "", description: "" },
+    ctaSection: { title: "", titleItalic: "", description: "", phone: "", email: "" },
+    serviceAreas: { title: "", description: "" }
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+      />
       <HeaderWrapper />
       <main>
         <Hero
-          title="More Than Just"
-          subtitle="Photos"
+          title={content.hero.title}
+          subtitle={content.hero.subtitle}
           showButtons={true}
         />
 
@@ -18,15 +164,15 @@ export default function AboutPage() {
         <section className="py-20 lg:py-32 px-6 lg:px-12 bg-white">
           <div className="max-w-4xl mx-auto">
             <p className="text-2xl lg:text-3xl text-gray-800 leading-relaxed mb-12 font-light first-letter-drop">
-              In today's visual-first world, your photos are your voice—and your first impression. That's why every session at Model Muse Studio is more than a photoshoot: it's an intentional, creative collaboration designed to showcase your personality, style, and potential.
+              {content.introduction.paragraph1}
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
               <p className="text-lg text-gray-600 leading-relaxed">
-                With expert direction, dynamic lighting, and an editorial eye, we create headshots, portraits, and creative looks that capture attention and open doors.
+                {content.introduction.paragraph2}
               </p>
               <p className="text-lg text-gray-600 leading-relaxed">
-                Our mission is simple: to help you frame your confidence through powerful, high-quality imagery that tells your unique story.
+                {content.introduction.paragraph3}
               </p>
             </div>
           </div>
@@ -40,7 +186,7 @@ export default function AboutPage() {
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="font-serif text-5xl lg:text-6xl mb-6">
-                Why Choose Model Muse Studio?
+                {content.whyChoose.title}
               </h2>
               <div className="w-24 h-px bg-black mx-auto"></div>
             </div>
@@ -52,9 +198,9 @@ export default function AboutPage() {
                     1
                   </div>
                 </div>
-                <h3 className="font-serif text-2xl mb-4">Tailored to You</h3>
+                <h3 className="font-serif text-2xl mb-4">{content.whyChoose.reason1.title}</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Every session is crafted around your goals—whether you're an aspiring talent or a seasoned pro.
+                  {content.whyChoose.reason1.description}
                 </p>
               </div>
 
@@ -64,9 +210,9 @@ export default function AboutPage() {
                     2
                   </div>
                 </div>
-                <h3 className="font-serif text-2xl mb-4">Industry Insight</h3>
+                <h3 className="font-serif text-2xl mb-4">{content.whyChoose.reason2.title}</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  We understand what agencies, casting directors, and brands want to see. Your images won't just look good—they'll work hard for your career.
+                  {content.whyChoose.reason2.description}
                 </p>
               </div>
 
@@ -76,9 +222,9 @@ export default function AboutPage() {
                     3
                   </div>
                 </div>
-                <h3 className="font-serif text-2xl mb-4">Confidence Through Imagery</h3>
+                <h3 className="font-serif text-2xl mb-4">{content.whyChoose.reason3.title}</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Our studio is a safe, supportive space where you're empowered to express your authentic self—boldly and unapologetically.
+                  {content.whyChoose.reason3.description}
                 </p>
               </div>
             </div>
@@ -90,48 +236,48 @@ export default function AboutPage() {
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="font-serif text-5xl lg:text-6xl mb-6">
-                What Sets Us Apart?
+                {content.whatSetsApart.title}
               </h2>
               <div className="w-24 h-px bg-black mx-auto"></div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-px bg-gray-200">
               <div className="bg-white p-10 hover:bg-gray-50 transition-colors">
-                <div className="text-4xl mb-4">📸</div>
-                <h3 className="font-serif text-2xl mb-4">Personalized Sessions</h3>
+                <div className="text-4xl mb-4">{content.whatSetsApart.feature1.icon}</div>
+                <h3 className="font-serif text-2xl mb-4">{content.whatSetsApart.feature1.title}</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  From clean headshots to full-body fashion editorials, every session is built around your aesthetic and career goals.
+                  {content.whatSetsApart.feature1.description}
                 </p>
               </div>
 
               <div className="bg-white p-10 hover:bg-gray-50 transition-colors">
-                <div className="text-4xl mb-4">✨</div>
-                <h3 className="font-serif text-2xl mb-4">Comfortable Studio Experience</h3>
+                <div className="text-4xl mb-4">{content.whatSetsApart.feature2.icon}</div>
+                <h3 className="font-serif text-2xl mb-4">{content.whatSetsApart.feature2.title}</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Our Fayetteville studio is designed to feel relaxed and welcoming—so you can focus on expressing yourself.
+                  {content.whatSetsApart.feature2.description}
                 </p>
               </div>
 
               <div className="bg-white p-10 hover:bg-gray-50 transition-colors">
-                <div className="text-4xl mb-4">⚡</div>
-                <h3 className="font-serif text-2xl mb-4">Fast Turnaround</h3>
+                <div className="text-4xl mb-4">{content.whatSetsApart.feature3.icon}</div>
+                <h3 className="font-serif text-2xl mb-4">{content.whatSetsApart.feature3.title}</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Fully edited photos delivered in as little as 48 hours—ready for agencies, castings, and social media.
+                  {content.whatSetsApart.feature3.description}
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Services Overview - Contact Only */}
+        {/* Ready Section */}
         <section className="py-20 lg:py-32 px-6 lg:px-12 bg-pure-black text-white text-center">
           <div className="max-w-4xl mx-auto">
             <h2 className="font-serif text-5xl lg:text-6xl mb-8">
-              Ready to Work Together?
+              {content.readySection.title}
             </h2>
             <div className="w-24 h-px bg-white mx-auto mb-8"></div>
             <p className="text-xl text-gray-300 mb-12 leading-relaxed">
-              Let's discuss your photography needs and create something amazing
+              {content.readySection.description}
             </p>
             <Link
               href="/contact"
@@ -146,25 +292,25 @@ export default function AboutPage() {
         <section className="py-32 lg:py-40 px-6 lg:px-12 bg-off-white text-center">
           <div className="max-w-4xl mx-auto">
             <h2 className="font-serif text-5xl lg:text-6xl mb-8 leading-tight">
-              Let's Create Something
-              <span className="block italic font-light mt-3">Amazing</span>
+              {content.ctaSection.title}
+              <span className="block italic font-light mt-3">{content.ctaSection.titleItalic}</span>
             </h2>
             <div className="w-24 h-px bg-black mx-auto mb-10"></div>
             <p className="text-xl text-gray-700 mb-16 leading-relaxed max-w-3xl mx-auto">
-              It's time to be seen the way you deserve. Whether you're updating your portfolio or trying something new, Model Muse Studio is here to help you show up, stand out, and move forward.
+              {content.ctaSection.description}
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 max-w-2xl mx-auto text-left">
               <div className="bg-white p-8 border border-gray-200">
                 <p className="text-sm tracking-widest uppercase text-gray-500 mb-3">Phone</p>
-                <a href="tel:9107037477" className="text-2xl font-serif hover:opacity-70 transition-opacity">
-                  910-703-7477
+                <a href={`tel:${content.ctaSection.phone.replace(/[^0-9]/g, '')}`} className="text-2xl font-serif hover:opacity-70 transition-opacity">
+                  {content.ctaSection.phone}
                 </a>
               </div>
               <div className="bg-white p-8 border border-gray-200">
                 <p className="text-sm tracking-widest uppercase text-gray-500 mb-3">Email</p>
-                <a href="mailto:contact@modelmusestudio.com" className="text-2xl font-serif hover:opacity-70 transition-opacity break-all">
-                  contact@modelmusestudio.com
+                <a href={`mailto:${content.ctaSection.email}`} className="text-2xl font-serif hover:opacity-70 transition-opacity break-all">
+                  {content.ctaSection.email}
                 </a>
               </div>
             </div>
@@ -182,11 +328,11 @@ export default function AboutPage() {
         <section className="py-20 px-6 lg:px-12 bg-white border-t border-gray-200">
           <div className="max-w-5xl mx-auto text-center">
             <h2 className="font-serif text-4xl lg:text-5xl mb-8">
-              Proudly Serving Talent Across North Carolina
+              {content.serviceAreas.title}
             </h2>
             <div className="w-24 h-px bg-black mx-auto mb-10"></div>
             <p className="text-lg text-gray-600 leading-relaxed max-w-4xl mx-auto">
-              We work with models and actors across <span className="font-semibold text-gray-800">Fayetteville</span>, Fort Liberty, Hope Mills, Dunn, Southern Pines, Lumberton, Sanford, Pinehurst, Fuquay-Varina, Laurinburg, Holly Springs, Smithfield, Raeford, Apex, Clayton, Garner, <span className="font-semibold text-gray-800">Wilmington</span>, Rockingham, <span className="font-semibold text-gray-800">Raleigh</span>, <span className="font-semibold text-gray-800">Durham</span>, and Cary, NC.
+              {content.serviceAreas.description}
             </p>
           </div>
         </section>

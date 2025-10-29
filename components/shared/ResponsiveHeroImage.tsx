@@ -23,6 +23,8 @@ export default function ResponsiveHeroImage({
         alt={alt}
         className={className}
         loading={priority ? 'eager' : 'lazy'}
+        decoding="async"
+        fetchPriority={priority ? 'high' : 'auto'}
       />
     )
   }
@@ -35,6 +37,8 @@ export default function ResponsiveHeroImage({
         alt={alt}
         className={className}
         loading={priority ? 'eager' : 'lazy'}
+        decoding="async"
+        fetchPriority={priority ? 'high' : 'auto'}
       />
     )
   }
@@ -101,8 +105,8 @@ export default function ResponsiveHeroImage({
         alt={alt}
         className={className}
         loading={priority ? 'eager' : 'lazy'}
-        // @ts-ignore - fetchpriority is valid but TypeScript doesn't recognize it yet
-        fetchpriority={priority ? 'high' : 'auto'}
+        decoding="async"
+        fetchPriority={priority ? 'high' : 'auto'}
       />
     </picture>
   )

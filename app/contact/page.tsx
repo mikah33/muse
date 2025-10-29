@@ -1,9 +1,104 @@
 import HeaderWrapper from '@/components/shared/HeaderWrapper'
 import Footer from '@/components/shared/Footer'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Contact Us - Model Muse Studio | Fayetteville NC Photography',
+  description: 'Get in touch with Model Muse Studio for professional photography services in Fayetteville NC. Contact us for model portfolios, headshots, and creative portraiture.',
+  openGraph: {
+    title: 'Contact Model Muse Studio - Fayetteville NC',
+    description: 'Ready to elevate your portfolio? Reach out to book your session.',
+    type: 'website',
+  },
+}
 
 export default function ContactPage() {
+  const contactSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    mainEntity: {
+      '@type': 'ProfessionalService',
+      name: 'Model Muse Studio',
+      telephone: '910-703-7477',
+      email: 'contact@modelmusestudio.com',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Fayetteville',
+        addressRegion: 'NC',
+        addressCountry: 'US',
+      },
+      openingHoursSpecification: [
+        {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+          opens: '09:00',
+          closes: '18:00',
+        },
+        {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: 'Saturday',
+          opens: '10:00',
+          closes: '16:00',
+        },
+      ],
+      sameAs: [
+        'https://www.instagram.com/model.muse.studio/',
+        'https://www.facebook.com/model.muse.studio',
+      ],
+    },
+  }
+
+  const localBusinessSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: 'Model Muse Studio',
+    image: 'https://modelmusestudio.com/images/logo.png',
+    description: 'Professional photography studio in Fayetteville NC',
+    url: 'https://modelmusestudio.com',
+    telephone: '910-703-7477',
+    email: 'contact@modelmusestudio.com',
+    priceRange: '$$',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Fayetteville',
+      addressRegion: 'NC',
+      addressCountry: 'US',
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: 35.0527,
+      longitude: -78.8784,
+    },
+    openingHoursSpecification: [
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        opens: '09:00',
+        closes: '18:00',
+      },
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: 'Saturday',
+        opens: '10:00',
+        closes: '16:00',
+      },
+    ],
+    sameAs: [
+      'https://www.instagram.com/model.muse.studio/',
+      'https://www.facebook.com/model.muse.studio',
+    ],
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(contactSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+      />
       <HeaderWrapper />
       <div className="min-h-screen bg-white">
         {/* Hero */}

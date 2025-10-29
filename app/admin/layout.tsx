@@ -1,5 +1,17 @@
 import AdminNav from '@/components/admin/AdminNav'
 import { createClient } from '@/lib/supabase/server'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
+}
 
 export default async function AdminLayout({
   children,

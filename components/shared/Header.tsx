@@ -91,7 +91,7 @@ export default function Header({ customPages = [] }: HeaderProps) {
                     scrolled ? 'text-black' : 'text-white'
                   }`}
                 >
-                  Pages
+                  More
                   <svg
                     className={`w-4 h-4 transition-transform duration-200 ${
                       pagesDropdownOpen ? 'rotate-180' : ''

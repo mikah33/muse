@@ -3,6 +3,17 @@ import Image from 'next/image'
 import HeaderWrapper from '@/components/shared/HeaderWrapper'
 import Footer from '@/components/shared/Footer'
 import { createClient } from '@/lib/supabase/server'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Portfolio - Model Muse Studio | Professional Photography Fayetteville NC',
+  description: 'View our portfolio of professional model photography, headshots, and creative portraiture. Based in Fayetteville NC, serving Fort Bragg and Cumberland County.',
+  openGraph: {
+    title: 'Portfolio - Model Muse Studio',
+    description: 'A curated collection of our finest work in fashion and beauty photography',
+    type: 'website',
+  },
+}
 
 interface PortfolioItem {
   id: string
@@ -25,8 +36,50 @@ export default async function PortfolioPage() {
     .eq('published', true)
     .order('order_position', { ascending: true })
 
+  const portfolioSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Portfolio - Model Muse Studio',
+    description: 'A curated collection of our finest work in fashion and beauty photography',
+    url: 'https://modelmusestudio.com/portfolio',
+    isPartOf: {
+      '@type': 'WebSite',
+      name: 'Model Muse Studio',
+      url: 'https://modelmusestudio.com',
+    },
+  }
+
+  const localBusinessSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: 'Model Muse Studio',
+    image: 'https://modelmusestudio.com/images/logo.png',
+    description: 'Professional photography studio in Fayetteville NC',
+    url: 'https://modelmusestudio.com',
+    telephone: '910-703-7477',
+    email: 'contact@modelmusestudio.com',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Fayetteville',
+      addressRegion: 'NC',
+      addressCountry: 'US',
+    },
+    sameAs: [
+      'https://www.instagram.com/model.muse.studio/',
+      'https://www.facebook.com/model.muse.studio',
+    ],
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(portfolioSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+      />
       <HeaderWrapper />
       <div className="min-h-screen bg-white">
         {/* Header */}
