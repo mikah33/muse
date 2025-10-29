@@ -124,11 +124,6 @@ export default async function PortfolioPage() {
                       </div>
                     )}
 
-                    {/* Title */}
-                    <h2 className="font-serif text-2xl leading-tight group-hover:text-gray-600 transition-colors">
-                      {item.title}
-                    </h2>
-
                     {/* Description */}
                     {item.description && (
                       <p className="text-gray-600 leading-relaxed line-clamp-2">
