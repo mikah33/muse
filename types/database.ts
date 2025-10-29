@@ -39,6 +39,7 @@ export interface Photo {
   gallery_id: string | null
   photo_url: string
   thumbnail_url: string
+  full_res_url: string
   title: string | null
   description: string | null
   file_size: number | null

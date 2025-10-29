@@ -59,11 +59,11 @@ const defaultContent: Record<string, any> = {
 
 export async function GET(
   request: Request,
-  { params }: { params: { page: string } }
+  { params }: { params: Promise<{ page: string }> }
 ) {
   try {
     const supabase = await createClient()
-    const { page } = params
+    const { page } = await params
 
     const { data, error } = await supabase
       .from('page_content')
@@ -88,18 +88,17 @@ export async function GET(
     return NextResponse.json(data.content)
   } catch (error) {
     console.error('Error fetching page content:', error)
-    const content = defaultContent[params.page] || {}
-    return NextResponse.json(content)
+    return NextResponse.json({}, { status: 500 })
   }
 }
 
 export async function POST(
   request: Request,
-  { params }: { params: { page: string } }
+  { params }: { params: Promise<{ page: string }> }
 ) {
   try {
     const supabase = await createClient()
-    const { page } = params
+    const { page } = await params
     const content = await request.json()
 
     const { error } = await supabase
