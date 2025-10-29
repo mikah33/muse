@@ -100,6 +100,45 @@ export default function AdminDashboard({
           </Link>
         </div>
 
+        {/* Website Management */}
+        <div className="mb-8">
+          <h2 className="text-lg font-semibold tracking-wider mb-4">WEBSITE MANAGEMENT</h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Link
+              href="/admin/services-editor"
+              className="p-6 bg-white border-2 border-gray-300 text-center hover:border-black hover:bg-gray-50 transition-all"
+            >
+              <div className="text-2xl mb-2">📋</div>
+              <div className="text-sm tracking-widest">EDIT SERVICES</div>
+              <div className="text-xs text-gray-600 mt-2">Edit the 5 service sections</div>
+            </Link>
+            <Link
+              href="/admin/homepage"
+              className="p-6 bg-white border-2 border-gray-300 text-center hover:border-black hover:bg-gray-50 transition-all"
+            >
+              <div className="text-2xl mb-2">🏠</div>
+              <div className="text-sm tracking-widest">EDIT HOMEPAGE</div>
+              <div className="text-xs text-gray-600 mt-2">Hero, About sections</div>
+            </Link>
+            <Link
+              href="/admin/settings"
+              className="p-6 bg-white border-2 border-gray-300 text-center hover:border-black hover:bg-gray-50 transition-all"
+            >
+              <div className="text-2xl mb-2">⚙️</div>
+              <div className="text-sm tracking-widest">SETTINGS</div>
+              <div className="text-xs text-gray-600 mt-2">Site configuration</div>
+            </Link>
+            <Link
+              href="/admin/pages"
+              className="p-6 bg-white border-2 border-gray-300 text-center hover:border-black hover:bg-gray-50 transition-all"
+            >
+              <div className="text-2xl mb-2">📄</div>
+              <div className="text-sm tracking-widest">PAGES</div>
+              <div className="text-xs text-gray-600 mt-2">Manage site pages</div>
+            </Link>
+          </div>
+        </div>
+
         {/* Recent Activity */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Recent Customers */}

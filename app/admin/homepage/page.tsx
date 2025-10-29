@@ -40,7 +40,7 @@ export default function HomepageEditor() {
 
   const fetchContent = async () => {
     try {
-      const response = await fetch('/api/admin/homepage')
+      const response = await fetch('/api/admin/homepage-content')
       const data = await response.json()
       setContent(data)
     } catch (error) {
@@ -54,7 +54,7 @@ export default function HomepageEditor() {
     if (!content) return
     setSaving(true)
     try {
-      const response = await fetch('/api/admin/homepage', {
+      const response = await fetch('/api/admin/homepage-content', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(content)
@@ -128,15 +128,23 @@ export default function HomepageEditor() {
       <div className="mb-8 flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold mb-2">Homepage Content Editor</h1>
-          <p className="text-gray-600">Edit all text content on the homepage</p>
+          <p className="text-gray-600">Edit hero, about, and services header text</p>
         </div>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="px-6 py-3 bg-black text-white hover:bg-gray-800 disabled:bg-gray-400 transition-colors"
-        >
-          {saving ? 'Saving...' : 'Save Changes'}
-        </button>
+        <div className="flex gap-3">
+          <a
+            href="/admin/services-editor"
+            className="px-6 py-3 border-2 border-black hover:bg-black hover:text-white transition-colors"
+          >
+            Edit 5 Service Sections →
+          </a>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="px-6 py-3 bg-black text-white hover:bg-gray-800 disabled:bg-gray-400 transition-colors"
+          >
+            {saving ? 'Saving...' : 'Save Changes'}
+          </button>
+        </div>
       </div>
 
       {/* Section Tabs */}
