@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Playfair_Display, Inter } from 'next/font/google'
 import './globals.css'
 import SEOSchema from '@/components/shared/SEOSchema'
+import GoogleAnalytics from '@/components/analytics/GoogleAnalytics'
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -132,8 +133,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: 'verification_token',
-    yandex: 'verification_token',
+    google: 'Z43Kx7R4Pc_O-uJ182hH7aE3ogr5w7DFwT0h6W2QIpA',
   },
   other: {
     'msvalidate.01': 'verification_token',
@@ -151,6 +151,7 @@ export default function RootLayout({
         <SEOSchema />
       </head>
       <body className="font-sans antialiased bg-pure-white text-pure-black">
+        <GoogleAnalytics />
         {children}
       </body>
     </html>
