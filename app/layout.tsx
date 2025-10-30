@@ -149,9 +149,9 @@ export default function RootLayout({
     <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
       <head>
         <SEOSchema />
+        <GoogleAnalytics />
       </head>
       <body className="font-sans antialiased bg-pure-white text-pure-black">
-        <GoogleAnalytics />
         {children}
       </body>
     </html>
