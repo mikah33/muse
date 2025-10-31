@@ -1,34 +1,29 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
-// GET all homepage content
+// GET all services
 export async function GET() {
   try {
     const supabase = await createClient()
 
-    const { data, error } = await supabase
-      .from('homepage_content')
-      .select('section, content')
+    const { data: services, error } = await supabase
+      .from('services')
+      .select('*')
+      .order('order_position')
 
     if (error) throw error
 
-    // Transform array to object format
-    const content = data.reduce((acc, item) => {
-      acc[item.section] = item.content
-      return acc
-    }, {} as Record<string, any>)
-
-    return NextResponse.json(content)
+    return NextResponse.json({ services })
   } catch (error) {
-    console.error('Error fetching homepage content:', error)
+    console.error('Error fetching services:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch content' },
+      { error: 'Failed to fetch services' },
       { status: 500 }
     )
   }
 }
 
-// PUT update a section
+// PUT update a service
 export async function PUT(request: Request) {
   try {
     const supabase = await createClient()
@@ -50,16 +45,16 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json()
-    const { id, icon, title, description, items } = body
+    const { id, title, description, icon, is_active, items } = body
 
     const { data, error } = await supabase
-      .from('homepage_sections')
+      .from('services')
       .update({
-        icon,
         title,
         description,
+        icon,
+        is_active,
         items,
-        updated_by: user.id,
         updated_at: new Date().toISOString()
       })
       .eq('id', id)
@@ -68,17 +63,17 @@ export async function PUT(request: Request) {
 
     if (error) throw error
 
-    return NextResponse.json({ section: data })
+    return NextResponse.json({ service: data })
   } catch (error) {
-    console.error('Error updating homepage section:', error)
+    console.error('Error updating service:', error)
     return NextResponse.json(
-      { error: 'Failed to update section' },
+      { error: 'Failed to update service' },
       { status: 500 }
     )
   }
 }
 
-// PATCH reorder sections
+// PATCH reorder services
 export async function PATCH(request: Request) {
   try {
     const supabase = await createClient()
@@ -99,23 +94,23 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const { sections } = await request.json()
+    const { services } = await request.json()
 
-    // Update display order for each section
-    const updates = sections.map((section: any, index: number) =>
+    // Update order_position for each service
+    const updates = services.map((service: any, index: number) =>
       supabase
-        .from('homepage_sections')
-        .update({ display_order: index + 1 })
-        .eq('id', section.id)
+        .from('services')
+        .update({ order_position: index + 1 })
+        .eq('id', service.id)
     )
 
     await Promise.all(updates)
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Error reordering sections:', error)
+    console.error('Error reordering services:', error)
     return NextResponse.json(
-      { error: 'Failed to reorder sections' },
+      { error: 'Failed to reorder services' },
       { status: 500 }
     )
   }

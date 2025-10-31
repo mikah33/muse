@@ -2,34 +2,52 @@
 
 import { useState, useEffect } from 'react'
 
-interface ServiceCategory {
-  id?: string
-  section_number: string
-  icon: string
+interface Service {
+  id: string
   title: string
   description: string
-  items: string[]
+  icon: string
+  order_position: number
+  is_active: boolean
+  items?: string[]
 }
 
 export default function Services() {
-  const [serviceCategories, setServiceCategories] = useState<ServiceCategory[]>([])
-  const [selectedService, setSelectedService] = useState<ServiceCategory | null>(null)
+  const [services, setServices] = useState<Service[]>([])
+  const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [headerContent, setHeaderContent] = useState({
+    title: 'Professional Photography Services',
+    subtitle: 'Fayetteville, North Carolina',
+    description: '',
+    subdescription: ''
+  })
 
   useEffect(() => {
+    // Fetch services
+    fetch('/api/admin/services')
+      .then(res => res.json())
+      .then(data => {
+        if (data.services) {
+          setServices(data.services.filter((s: Service) => s.is_active))
+        }
+      })
+      .catch(err => console.error('Failed to load services:', err))
+
+    // Fetch header content
     fetch('/api/admin/homepage')
       .then(res => res.json())
       .then(data => {
-        if (data.sections && data.sections.length > 0) {
-          setServiceCategories(data.sections)
+        if (data.services_header) {
+          setHeaderContent(data.services_header)
         }
       })
-      .catch(err => console.error('Failed to load homepage sections:', err))
+      .catch(err => console.error('Failed to load header content:', err))
       .finally(() => setLoading(false))
   }, [])
 
-  const handleServiceClick = (service: ServiceCategory) => {
+  const handleServiceClick = (service: Service) => {
     setIsLoading(true)
     setTimeout(() => {
       setSelectedService(service)
@@ -53,23 +71,27 @@ export default function Services() {
       <section className="py-12 md:py-20 lg:py-32 px-4 md:px-6 lg:px-12 max-w-7xl mx-auto">
         <div className="mb-12 md:mb-20 text-center">
           <h2 className="font-serif text-3xl md:text-5xl lg:text-6xl mb-3 md:mb-4">
-            Professional Photography Services
-            <span className="block text-xl md:text-3xl lg:text-4xl italic font-light mt-2 md:mt-3 text-gray-700">Fayetteville, North Carolina</span>
+            {headerContent.title}
+            <span className="block text-xl md:text-3xl lg:text-4xl italic font-light mt-2 md:mt-3 text-gray-700">{headerContent.subtitle}</span>
           </h2>
-          <p className="text-base md:text-lg text-gray-700 max-w-3xl mx-auto mt-4 md:mt-6 mb-3 md:mb-4 hidden md:block">
-            Model Muse Studio is Fayetteville's premier photography studio specializing in professional model portfolios, actor headshots, business portraits, and creative photography serving Cumberland County and surrounding North Carolina areas.
-          </p>
-          <p className="text-sm md:text-base text-gray-600 max-w-3xl mx-auto mb-6 md:mb-8 hidden md:block">
-            Comprehensive photography services for models, actors, and professionals including professional headshots, portfolio photography, comp card design, and creative portraits in Fayetteville NC.
-          </p>
+          {headerContent.description && (
+            <p className="text-base md:text-lg text-gray-700 max-w-3xl mx-auto mt-4 md:mt-6 mb-3 md:mb-4 hidden md:block">
+              {headerContent.description}
+            </p>
+          )}
+          {headerContent.subdescription && (
+            <p className="text-sm md:text-base text-gray-600 max-w-3xl mx-auto mb-6 md:mb-8 hidden md:block">
+              {headerContent.subdescription}
+            </p>
+          )}
           <div className="w-16 md:w-24 h-px bg-black mx-auto"></div>
         </div>
 
         <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-px bg-gray-200">
-          {serviceCategories.slice(0, 5).map((category, index) => (
+          {services.slice(0, 5).map((service, index) => (
             <button
-              key={category.title}
-              onClick={() => handleServiceClick(category)}
+              key={service.id}
+              onClick={() => handleServiceClick(service)}
               className={`bg-white p-4 md:p-8 lg:p-12 group cursor-pointer transition-all duration-500 hover:bg-black hover:text-white text-left relative overflow-hidden ${
                 index === 0 ? 'lg:col-span-2' : ''
               } ${index === 3 ? 'lg:col-span-2' : ''}`}
@@ -79,16 +101,16 @@ export default function Services() {
 
               <div className="mb-2 md:mb-6 relative">
                 <span className="text-3xl md:text-6xl font-serif opacity-10 group-hover:opacity-20 transition-all duration-500">
-                  {category.section_number}
+                  {String(index + 1).padStart(2, '0')}
                 </span>
               </div>
               <div className="mb-2 md:mb-6 relative">
                 <div className="flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-2 mb-2 md:mb-3">
                   <span className="text-xl md:text-2xl transform group-hover:scale-110 transition-transform duration-300">
-                    {category.icon}
+                    {service.icon}
                   </span>
                   <h3 className="text-xs md:text-2xl font-serif tracking-wide transform group-hover:translate-x-1 transition-transform duration-300 leading-tight">
-                    {category.title}
+                    {service.title}
                   </h3>
                 </div>
               </div>
@@ -187,19 +209,21 @@ export default function Services() {
                 <h2 className="font-serif text-3xl lg:text-4xl">{selectedService.title}</h2>
               </div>
 
-              <p className="text-gray-600 mb-8 font-light leading-relaxed">
+              <p className="text-gray-600 mb-8 font-light leading-relaxed text-lg">
                 {selectedService.description}
               </p>
 
-              <div className="space-y-6">
-                {selectedService.items.map((item, index) => (
-                  <div key={index} className="border-l-2 border-gray-200 pl-6">
-                    <p className="text-gray-700 leading-relaxed font-light">
-                      {item}
-                    </p>
-                  </div>
-                ))}
-              </div>
+              {selectedService.items && selectedService.items.length > 0 && (
+                <div className="space-y-6 mb-8">
+                  {selectedService.items.map((item, index) => (
+                    <div key={index} className="border-l-2 border-gray-200 pl-6">
+                      <p className="text-gray-700 leading-relaxed font-light">
+                        {item}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <div className="mt-10 pt-8 border-t border-gray-200">
                 <button

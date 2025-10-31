@@ -18,15 +18,41 @@ export default function AdminLoginForm() {
     setLoading(true)
 
     try {
+      console.log('Attempting login with:', email)
+
       // Sign in with Supabase
-      const { error: authError } = await supabase.auth.signInWithPassword({
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
-      if (authError) throw authError
+      if (authError) {
+        console.error('Auth error:', authError)
+        throw authError
+      }
+
+      console.log('Login successful, user:', data.user?.id)
+
+      // Check if user exists in users table and has admin role
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', data.user!.id)
+        .single()
+
+      console.log('User data:', userData, 'Error:', userError)
+
+      if (userError || !userData) {
+        throw new Error('User record not found. Please contact administrator.')
+      }
+
+      if (userData.role !== 'admin') {
+        await supabase.auth.signOut()
+        throw new Error('Access denied. Admin role required.')
+      }
 
       // Redirect to admin dashboard
+      console.log('Redirecting to /admin')
       router.push('/admin')
       router.refresh()
     } catch (err: any) {

@@ -1,5 +1,5 @@
-import HomepageEditor from '@/components/admin/HomepageEditor'
+import ServicesEditor from '@/components/admin/ServicesEditor'
 
 export default function ServicesEditorPage() {
-  return <HomepageEditor />
+  return <ServicesEditor />
 }

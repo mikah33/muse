@@ -1,8 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/auth/auth-helpers'
 import Link from 'next/link'
 import HeroImageUpload from '@/components/admin/HeroImageUpload'
 
 export default async function AdminPage() {
+  // Require admin authentication
+  const adminUser = await requireAdmin()
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
